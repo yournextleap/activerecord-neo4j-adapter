@@ -26,7 +26,7 @@ module ActiveRecord
         super(self.neo_server, log)
         
         # Create model index if it doesn't exist
-        neo_server.create_node_index(INDICES[:model]) if not neo_server.list_node_indexes[INDICES[:model]]
+        neo_server.create_node_index(INDICES[:model]) if not (!!(node_indices = neo_server.list_node_indexes) and !!node_indices[INDICES[:model]])
       end
 
       def supports_migrations?
