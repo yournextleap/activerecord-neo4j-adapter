@@ -6,10 +6,10 @@ Gem::Specification.new do |s|
   s.name        = "activerecord-neo4j-adapter"
   s.version     = Activerecord::Neo4j::Adapter::VERSION
   s.authors     = ["Nikhil Lanjewar"]
-  s.email       = ["nikhil@lanjewar.com"]
+  s.email       = ["nikhil@yournextleap.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{ActiveRecord connection adapter for Neo4j graph database}
+  s.description = %q{ActiveRecord connection adapter that allows connections to Neo4j Graph database}
 
   s.rubyforge_project = "activerecord-neo4j-adapter"
 
