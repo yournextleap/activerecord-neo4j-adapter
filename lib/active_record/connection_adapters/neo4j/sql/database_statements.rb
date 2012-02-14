@@ -43,11 +43,11 @@ module ActiveRecord
 
             # Check if index exists on the model
             raise ArgumentError.new("Index for #{column_name.inspect} exists on model #{model_name}")\
-             if model.indices.present? and (model_node.indices & column_index_name_for(column_name)).present?
+             if model_node.indices.present? and (model_node.indices & column_index_name_for(column_name, options)).present?
 
             # Add new indices
             model_indices = model_node.respond_to?(:indices) ? model_node.indices : []
-            model_indices += column_index_name_for(column_name)
+            model_indices += column_index_name_for(column_name, options)
 
             # Update model with new indices
             neo_server.set_node_properties model_node, {'indices' => model_indices}
@@ -61,10 +61,17 @@ module ActiveRecord
             model_node = Neography::Node.load(model_node_id)
           end
 
-          def column_index_name_for(column_name)
+          def column_index_name_for(column_name, options = {})
             column_names = Array.wrap(column_name)
+            column_names.collect{|column_name| index_hash_for(column_name, options).inspect}
+          end
 
-            column_names.collect{|column_name| 'column_'+column_name.to_s}
+          def index_hash_for(column_name, options)
+            index_hash = {}
+            index_hash[:column] = column_name
+            index_hash[:name] = options[:name] if options[:name].present?
+            index_hash[:unique] = options[:unique].present?
+            index_hash
           end
         end # DatabaseStatements
       end # Sql
