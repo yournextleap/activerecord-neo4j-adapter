@@ -53,6 +53,10 @@ module ActiveRecord
             neo_server.set_node_properties model_node, {'indices' => model_indices}
           end # add_index
 
+          def columns(model_name, log_msg=nil)
+            
+          end
+
           protected
           def get_model_node(model_name)
             model_node_attributes = neo_server.find_node_index indices[:model], 'model', model_name
