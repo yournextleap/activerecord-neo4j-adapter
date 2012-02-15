@@ -58,6 +58,9 @@ module ActiveRecord
             model_node.columns.collect{|column| Column.new eval(column)[:name], nil, eval(column)[:type]}
           end
 
+          def select_values(selection_manager)
+          end
+
           protected
           def get_model_node(model_name)
             model_node_attributes = neo_server.find_node_index indices[:model], 'model', model_name
