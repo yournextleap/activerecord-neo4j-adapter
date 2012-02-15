@@ -1,5 +1,6 @@
 require 'neography/config'
 require 'active_record/connection_adapters/neo4j/sql/database_statements'
+require 'active_record/connection_adapters/neo4j/sql/graph_handler'
 
 module ActiveRecord
   class Base
@@ -14,6 +15,7 @@ module ActiveRecord
   module ConnectionAdapters
     class Neo4jRestAdapter < AbstractAdapter
       include ActiveRecord::ConnectionAdapters::Neo4j::Sql::DatabaseStatements
+      include ActiveRecord::ConnectionAdapters::Neo4j::Sql::GraphHandler
 
       INDICES = {
                   :model => 'model_index'

@@ -6,6 +6,9 @@ module ActiveRecord
     module Neo4j
       module Sql
         module DatabaseStatements
+          require 'active_record/connection_adapters/neo4j/accessor'
+          include ActiveRecord::ConnectionAdapters::Neo4j::Accessor
+
           def tables(name=nil, database=nil)
             table_names = neo_server.find_node_index(indices[:model], 'type', 'model').collect{|node| node['data']['model']} rescue nil
             table_names || []
@@ -58,17 +61,11 @@ module ActiveRecord
             model_node.columns.collect{|column| Column.new eval(column)[:name], nil, eval(column)[:type]}
           end
 
-          def select_values(selection_manager)
+          def select_values(arel_response)
+            send "execute_#{arel_response.type}", arel_response.params
           end
 
           protected
-          def get_model_node(model_name)
-            model_node_attributes = neo_server.find_node_index indices[:model], 'model', model_name
-            raise ArgumentError.new("Model #{model_name} does not exist!") if not model_node_attributes.present?
-            model_node_id = model_node_attributes.first['self'].split('/').last.to_i
-            model_node = Neography::Node.load(model_node_id)
-          end
-
           def column_index_name_for(column_name, options = {})
             column_names = Array.wrap(column_name)
             column_names.collect{|column_name| index_hash_for(column_name, options).inspect}
