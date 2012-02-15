@@ -54,7 +54,8 @@ module ActiveRecord
           end # add_index
 
           def columns(model_name, log_msg=nil)
-            
+            model_node = get_model_node model_name
+            model_node.columns.collect{|column| Column.new eval(column)[:name], nil, eval(column)[:type]}
           end
 
           protected
