@@ -21,6 +21,10 @@ module ActiveRecord
              
           end
 
+          def execute_delete(deletions)
+            model_node = get_model_node(deletions.last[:model])
+          end
+
         end # GraphHandler
       end # Sql
     end # Neo4j

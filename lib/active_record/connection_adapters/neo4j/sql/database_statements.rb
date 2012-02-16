@@ -65,12 +65,21 @@ module ActiveRecord
             send "execute_#{arel_response.type}", arel_response.params
           end
 
-          def insert(arel_response, name = nil, pk = nil, id_value = nil, sequence_name = nil)
+          protected
+
+          def insert_sql(arel_response, name = nil, pk = nil, id_value = nil, sequence_name = nil)
             send "execute_#{arel_response.type}", arel_response.params
             id_value
           end
 
-          protected
+          def update_sql(arel_response, name=nil)
+
+          end
+
+          def delete_sql(arel_response, name=nil)
+            send "execute_#{arel_response.type}", arel_response.params
+          end
+
           def column_index_name_for(column_name, options = {})
             column_names = Array.wrap(column_name)
             column_names.collect{|column_name| index_hash_for(column_name, options).inspect}

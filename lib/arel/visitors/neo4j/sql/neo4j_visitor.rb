@@ -20,11 +20,20 @@ module Arel
           end
 
           private
-          def visit_Arel_Nodes_DeleteStatement o
+          def visit_Arel_Nodes_DeleteStatement delete_statement
+            model = visit delete_statement.relation
+            conditions = delete_statement.wheres.map {|where| visit where}.inject({}){|hash, next_item| hash.merge(next_item)}
+
+            type = :delete
+            deletions = {:model => model, :conditions => conditions}
+            Arel::Visitors::Neo4j::Response.new type, deletions
+=begin
             [
               "DELETE FROM #{visit o.relation}",
               ("WHERE #{o.wheres.map { |x| visit x }.join ' AND '}" unless o.wheres.empty?)
             ].compact.join ' '
+=end
+
           end
 
           def visit_Arel_Nodes_UpdateStatement o
@@ -270,9 +279,11 @@ module Arel
             right = o.right
 
             if right.nil?
-              "#{visit o.left} IS NULL"
+              {(visit o.left) => nil}
+              #"#{visit o.left} IS NULL"
             else
-              "#{visit o.left} = #{visit right}"
+              {(visit o.left) => (visit o.right)}
+              #"#{visit o.left} = #{visit right}"
             end
           end
 
@@ -296,8 +307,12 @@ module Arel
 
           def visit_Arel_Attributes_Attribute o
             self.last_column = o.column
+            o.name
+=begin
             join_name = o.relation.table_alias || o.relation.name
             "#{quote_table_name join_name}.#{quote_column_name o.name}"
+=end
+
           end
           alias :visit_Arel_Attributes_Integer :visit_Arel_Attributes_Attribute
           alias :visit_Arel_Attributes_Float :visit_Arel_Attributes_Attribute
@@ -311,7 +326,10 @@ module Arel
           alias :visit_Arel_SqlLiteral :visit_Fixnum # This is deprecated
           alias :visit_Bignum :visit_Fixnum
 
-          def visit_String o; quote(o, last_column) end
+          def visit_String o
+           #quote(o, last_column)
+           o
+          end
 
           def last_column
             Thread.current[:arel_visitors_to_sql_last_column]
