@@ -48,7 +48,13 @@ module Arel
             ].compact.join ' '
           end
 
-          def visit_Arel_Nodes_InsertStatement o
+          def visit_Arel_Nodes_InsertStatement insert_statement
+            insertions = {:model => visit(insert_statement.relation), :values => visit(insert_statement.values)}
+            type = :insert
+
+            Arel::Visitors::Neo4j::Response.new type, :params => insertions
+
+=begin
             [
               "INSERT INTO #{visit o.relation}",
 
@@ -58,6 +64,8 @@ module Arel
 
               (visit o.values if o.values),
             ].compact.join ' '
+=end
+
           end
 
           def visit_Arel_Nodes_Exists o
@@ -65,16 +73,32 @@ module Arel
               o.alias ? " AS #{visit o.alias}" : ''}"
           end
 
-          def visit_Arel_Nodes_Values o
+          def visit_Arel_Nodes_Values values
+            values.expressions.zip(values.columns).map{|expression, column| {column.name => expression}}.inject({}){|h,i| h.merge(i)}
+=begin
             "VALUES (#{o.expressions.zip(o.columns).map { |value, column|
               quote(value, column && column.column)
             }.join ', '})"
+=end
+
           end
 
           def visit_Arel_Nodes_SelectStatement o
             selections = o.cores.collect{|core| {:model => core.froms.name.to_sym, :attributes => core.projections.collect{|projection| projection.name}}}
             type = :select
             Arel::Visitors::Neo4j::Response.new type, :params => selections
+
+            # SQL implementation for reference
+=begin
+            [
+              o.cores.map { |x| visit_Arel_Nodes_SelectCore x }.join,
+              ("ORDER BY #{o.orders.map { |x| visit x }.join(', ')}" unless o.orders.empty?),
+              (visit(o.limit) if o.limit),
+              (visit(o.offset) if o.offset),
+              (visit(o.lock) if o.lock),
+            ].compact.join ' '
+=end
+
           end
 
           def visit_Arel_Nodes_SelectCore o
@@ -218,11 +242,7 @@ module Arel
           end
 
           def visit_Arel_Table o
-            if o.table_alias
-              "#{quote_table_name o.name} #{quote_table_name o.table_alias}"
-            else
-              quote_table_name o.name
-            end
+            o.name
           end
 
           def visit_Arel_Nodes_In o

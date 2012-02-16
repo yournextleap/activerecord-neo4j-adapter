@@ -61,8 +61,13 @@ module ActiveRecord
             model_node.columns.collect{|column| Column.new eval(column)[:name], nil, eval(column)[:type]}
           end
 
-          def select_values(arel_response)
+          def select_rows(arel_response, name=nil)
             send "execute_#{arel_response.type}", arel_response.params
+          end
+
+          def insert(arel_response, name = nil, pk = nil, id_value = nil, sequence_name = nil)
+            send "execute_#{arel_response.type}", arel_response.params
+            id_value
           end
 
           protected
