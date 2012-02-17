@@ -18,7 +18,8 @@ module ActiveRecord
 
           def execute_insert(insertions)
             model_node = get_model_node(insertions[:model])
-            instance_node = Neography::Node.create insertions[:values]
+            node_id = neo_server.execute_script(insertions[:query])['self'].split('/').last.to_i
+            instance_node = Neography::Node.load node_id
             
             model_node.outgoing('instances') << instance_node
              
