@@ -93,7 +93,8 @@ module Arel
           end
 
           def visit_Arel_Nodes_SelectStatement o
-            selections = o.cores.collect{|core| {:model => core.froms.name.to_sym, :attributes => core.projections.collect{|projection| projection.name}}}
+            #selections = o.cores.collect{|core| {:model => core.froms.name.to_sym, :attributes => core.projections.collect{|projection| projection.name}}}
+            selections = o.cores.map{|core| {:model => core.froms.name.to_sym, :query => visit_Arel_Nodes_SelectCore(core)}}
             type = :select
             Arel::Visitors::Neo4j::Response.new type, :params => selections
 
@@ -112,14 +113,22 @@ module Arel
 
           def visit_Arel_Nodes_SelectCore o
             [
-              "SELECT",
-              (visit(o.top) if o.top),
-              "#{o.projections.map { |x| visit x }.join ', '}",
-              ("FROM #{visit o.froms}" if o.froms),
-              ("WHERE #{o.wheres.map { |x| visit x }.join ' AND ' }" unless o.wheres.empty?),
-              ("GROUP BY #{o.groups.map { |x| visit x }.join ', ' }" unless o.groups.empty?),
-              (visit(o.having) if o.having),
-            ].compact.join ' '
+              #"SELECT",
+              #(visit(o.top) if o.top),
+              #"#{o.projections.map { |x| visit x }.join ', '}",
+              #("FROM #{visit o.froms}" if o.froms),
+              "t = new Table();g",
+              "v(start_node)",
+              "out('instances')",
+              ("filter{#{o.wheres.map { |x| visit x }.join ' && ' }}" unless o.wheres.empty?),
+              "#{o.projections.map{|x| "#{visit(x).to_s}.as(#{visit(x).to_s.inspect})"}.join('.back(1).')}",
+              "table(t, #{o.projections.map{|x| visit(x).to_s}.inspect})",
+              "iterate();t;",
+              #("WHERE #{o.wheres.map { |x| visit x }.join ' AND ' }" unless o.wheres.empty?),
+              #("GROUP BY #{o.groups.map { |x| visit x }.join ', ' }" unless o.groups.empty?),
+              #(visit(o.having) if o.having),
+            #].compact.join ' '
+            ].compact.join '.'
           end
 
           def visit_Arel_Nodes_Having o
@@ -279,10 +288,12 @@ module Arel
             right = o.right
 
             if right.nil?
-              {(visit o.left) => nil}
+              "!it.hasProperty(#{visit(o.left).to_s.inspect})"
+              #{(visit o.left) => nil}
               #"#{visit o.left} IS NULL"
             else
-              {(visit o.left) => (visit o.right)}
+              "it.#{visit(o.left).to_s} == #{visit o.right}"
+              #{(visit o.left) => (visit o.right)}
               #"#{visit o.left} = #{visit right}"
             end
           end
@@ -291,9 +302,11 @@ module Arel
             right = o.right
 
             if right.nil?
-              "#{visit o.left} IS NOT NULL"
+              "it.hasProperty(#{visit(o.left).to_s.inspect})"
+              #"#{visit o.left} IS NOT NULL"
             else
-              "#{visit o.left} != #{visit right}"
+              "!#{Array.wrap(visit(o.right)).inspect}.contains(it.#{visit(o.left).to_s})"
+              #"#{visit o.left} != #{visit right}"
             end
           end
 
@@ -328,7 +341,7 @@ module Arel
 
           def visit_String o
            #quote(o, last_column)
-           o
+           o.inspect
           end
 
           def last_column
@@ -354,7 +367,8 @@ module Arel
           alias :visit_Class :visit_String
 
           def visit_Array o
-            o.empty? ? 'NULL' : o.map { |x| visit x }.join(', ')
+            #o.empty? ? 'NULL' : o.map { |x| visit x }.join(', ')
+            o.empty? ? nil : o.map { |x| visit x }.inspect
           end
 
           def quote value, column = nil
