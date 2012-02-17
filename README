@@ -13,6 +13,38 @@ Check connection:
 $ rails c
 Loading development environment (Rails 3.0.9)
 irb(main):001:0> c = ActiveRecord::Base.connection
-=> #<ActiveRecord::ConnectionAdapters::Neo4jRestAdapter:0xb66afd68 @query_cache_enabled=false, @logger=#<ActiveSupport::BufferedLogger:0xb6b31710 @auto_flushing=1, @log=#<File:/media/Softwares/Work/SampleDbAdapter/log/development.log>, @guard=#<Mutex:0xb6b1c43c>, @buffer={}, @level=0>, @active=nil, @instrumenter=#<ActiveSupport::Notifications::Instrumenter:0xb66af6b0 @notifier=#<ActiveSupport::Notifications::Fanout:0xb66a5804 @listeners_for={}, @subscribers=[#<ActiveSupport::Notifications::Fanout::Subscriber:0xb66a4058 @delegate=#<ActiveRecord::LogSubscriber:0xb66a6038 @odd_or_even=false>, @pattern="sql.active_record">, #<ActiveSupport::Notifications::Fanout::Subscriber:0xb66a3d24 @delegate=#<ActiveRecord::LogSubscriber:0xb66a6038 @odd_or_even=false>, @pattern="logger.active_record">, #<ActiveSupport::Notifications::Fanout::Subscriber:0xb66a3cc0 @delegate=#<ActiveRecord::LogSubscriber:0xb66a6038 @odd_or_even=false>, @pattern="odd?.active_record">]>, @id="2b30e3a35f1f39b7ecf6">, @connection=#<Neography::Rest:0xb66afd7c @max_threads=20, @server="localhost", @log_enabled=false, @protocol="http://", @port=7474, @log_file="neography.log", @authentication={}, @directory="">, @neo_server=#<Neography::Rest:0xb66afd7c @max_threads=20, @server="localhost", @log_enabled=false, @protocol="http://", @port=7474, @log_file="neography.log", @authentication={}, @directory="">, @query_cache={}>
 irb(main):002:0> c.neo_server.list_node_indexes
 => {"model_index"=>{"type"=>"exact", "template"=>"http://localhost:7474/db/data/index/node/model_index/{key}/{value}", "provider"=>"lucene"}}
+
+For applications using multiple databases:
+------------------------------------------
+
+config/database.yml
+
+development:
+  adapter: mysql2
+  host: localhost
+  user: mysql
+  password: mysql
+
+graph_development:
+  adapter: neo4j_rest
+  host: localhost
+  port: 7474
+
+Some regular model:
+
+class User < ActiveRecord::Base
+
+...
+
+end
+
+Model using neo4j_rest adapter (add establish_connection to corresponding entry in database.yml):
+
+class User < ActiveRecord::Base
+  establish_connection "graph_#{Rails.env}"
+
+  ...
+
+end
