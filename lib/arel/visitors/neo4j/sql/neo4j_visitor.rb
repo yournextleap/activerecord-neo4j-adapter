@@ -58,7 +58,13 @@ module Arel
           end
 
           def visit_Arel_Nodes_InsertStatement insert_statement
-            insertions = {:model => visit(insert_statement.relation), :values => visit(insert_statement.values)}
+            #insertions = {:model => visit(insert_statement.relation), :values => visit(insert_statement.values)}
+            query = [
+                      "g.addVertex(",
+                      ("[#{visit(insert_statement.values)}]" unless insert_statement.columns.empty?),
+                      ")"
+                    ].join
+            insertions = {:model => visit(insert_statement.relation), :query => query}
             type = :insert
 
             Arel::Visitors::Neo4j::Response.new type, :params => insertions
@@ -83,7 +89,8 @@ module Arel
           end
 
           def visit_Arel_Nodes_Values values
-            values.expressions.zip(values.columns).map{|expression, column| {column.name => expression}}.inject({}){|h,i| h.merge(i)}
+            values.expressions.zip(values.columns).map{|expression, column| "#{column.name.to_s} : #{visit expression}"}.join(',')
+            #values.expressions.zip(values.columns).map{|expression, column| {column.name => expression}}.inject({}){|h,i| h.merge(i)}
 =begin
             "VALUES (#{o.expressions.zip(o.columns).map { |value, column|
               quote(value, column && column.column)
