@@ -22,11 +22,18 @@ module Arel
           private
           def visit_Arel_Nodes_DeleteStatement delete_statement
             model = visit delete_statement.relation
-            conditions = delete_statement.wheres.map {|where| visit where}.inject({}){|hash, next_item| hash.merge(next_item)}
+            query = [
+                      "g",
+                      "v(start_node)",
+                      "out('instances')",
+                      ("filter{#{delete_statement.wheres.map { |x| visit x }.join ' && ' }}" unless delete_statement.wheres.empty?),
+                      "each{ model=g.v(start_node); g.removeEdge(model, it, 'instances'); g.removeVertex(it)}"
+                    ].join('.')
+            #conditions = delete_statement.wheres.map {|where| visit where}.inject({}){|hash, next_item| hash.merge(next_item)}
 
             type = :delete
-            deletions = {:model => model, :conditions => conditions}
-            Arel::Visitors::Neo4j::Response.new type, deletions
+            deletions = {:model => model, :query => query}
+            Arel::Visitors::Neo4j::Response.new type, :params => deletions
 =begin
             [
               "DELETE FROM #{visit o.relation}",
