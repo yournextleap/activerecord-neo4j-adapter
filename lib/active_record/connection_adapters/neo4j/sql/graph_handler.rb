@@ -9,8 +9,11 @@ module ActiveRecord
           include ActiveRecord::ConnectionAdapters::Neo4j::Accessor
 
           def execute_select(selections)
-            model_node = get_model_node(selections.last[:model])
-            model_node.outgoing('instances').collect{|instance| selections.last[:attributes].collect{|attribute| instance.send(attribute)}}
+            #model_node = get_model_node(selections.last[:model])
+            #model_node.outgoing('instances').collect{|instance| selections.last[:attributes].collect{|attribute| instance.send(attribute)}}
+            #selections.map do |selection|
+              neo_server.execute_script(selections.last[:query], {:start_node => get_model_node_id(selections.last[:model])})['data']
+            #end
           end
 
           def execute_insert(insertions)
