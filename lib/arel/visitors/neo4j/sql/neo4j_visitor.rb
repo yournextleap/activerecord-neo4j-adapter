@@ -57,11 +57,27 @@ module Arel
               wheres = [Nodes::In.new(o.relation.primary_key, [stmt])]
             end
 
+            model = visit o.relation
+            query = [
+                      "g",
+                      "v(start_node)",
+                      "out('instances')",
+                      ("filter{#{wheres.map { |x| visit x }.join ' && ' }}" unless wheres.empty?),
+                      "each{#{o.values.map{|x| "it.#{visit x}"}.join(',')}}"
+                    ].join('.')
+
+            type = :update
+            update = {:model => model, :query => query}
+            Arel::Visitors::Neo4j::Response.new type, :params => update
+
+=begin
             [
               "UPDATE #{visit o.relation}",
               ("SET #{o.values.map { |value| visit value }.join ', '}" unless o.values.empty?),
               ("WHERE #{wheres.map { |x| visit x }.join ' AND '}" unless wheres.empty?)
             ].compact.join ' '
+=end
+
           end
 
           def visit_Arel_Nodes_InsertStatement insert_statement

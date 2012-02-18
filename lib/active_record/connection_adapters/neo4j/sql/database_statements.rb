@@ -62,22 +62,22 @@ module ActiveRecord
           end
 
           def select_rows(arel_response, name=nil)
-            send "execute_#{arel_response.type}", arel_response.params
+            send "execute_#{arel_response.type}", arel_response.params, name
           end
 
           protected
 
           def insert_sql(arel_response, name = nil, pk = nil, id_value = nil, sequence_name = nil)
-            send "execute_#{arel_response.type}", arel_response.params
+            send "execute_#{arel_response.type}", arel_response.params, name
             id_value
           end
 
           def update_sql(arel_response, name=nil)
-
+            send "execute_#{arel_response.type}", arel_response.params, name
           end
 
           def delete_sql(arel_response, name=nil)
-            send "execute_#{arel_response.type}", arel_response.params
+            send "execute_#{arel_response.type}", arel_response.params, name
           end
 
           def column_index_name_for(column_name, options = {})
