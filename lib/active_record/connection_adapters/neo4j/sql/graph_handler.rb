@@ -24,8 +24,8 @@ module ActiveRecord
              
           end
 
-          def execute_delete(deletions)
-            model_node = get_model_node(deletions.last[:model])
+          def execute_delete(deletion)
+            neo_server.execute_script(deletion[:query], {:start_node => get_model_node_id(deletion[:model])})
           end
 
         end # GraphHandler
