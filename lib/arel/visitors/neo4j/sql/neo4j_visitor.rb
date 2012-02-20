@@ -374,6 +374,10 @@ module Arel
            o.inspect
           end
 
+          def visit_DateTime o
+            o.to_s.inspect
+          end
+
           def last_column
             Thread.current[:arel_visitors_to_sql_last_column]
           end
@@ -384,13 +388,15 @@ module Arel
 
           alias :visit_ActiveSupport_Multibyte_Chars :visit_String
           alias :visit_BigDecimal :visit_String
-          alias :visit_Date :visit_String
-          alias :visit_DateTime :visit_String
+          #alias :visit_Date :visit_String
+          alias :visit_Date :visit_DateTime
+          #alias :visit_DateTime :visit_String
           alias :visit_FalseClass :visit_String
           alias :visit_Float :visit_String
           alias :visit_Hash :visit_String
           alias :visit_Symbol :visit_String
-          alias :visit_Time :visit_String
+          #alias :visit_Time :visit_String
+          alias :visit_Time :visit_DateTime
           alias :visit_TrueClass :visit_String
           alias :visit_NilClass :visit_String
           alias :visit_ActiveSupport_StringInquirer :visit_String

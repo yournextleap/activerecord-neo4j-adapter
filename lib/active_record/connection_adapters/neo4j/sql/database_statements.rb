@@ -19,6 +19,7 @@ module ActiveRecord
             raise ArgumentError.new("Model #{model_name} already exists!") if table_exists?(model_name)
 
             model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.new model_name
+            model_definition.primary_key(options[:primary_key] || Base.get_primary_key(model_name.to_s.singularize)) unless options[:id] == false
 
             yield model_definition if block_given?
 
@@ -27,6 +28,11 @@ module ActiveRecord
             neo_server.add_node_to_index indices[:model], 'type', 'model', model_node
             neo_server.add_node_to_index indices[:model], 'model', model_name, model_node
           end # create_table
+
+          def primary_key(model_name)
+            model_node = get_model_node model_name
+            model_node.primary_key
+          end # primary_key
 
           def drop_table(model_name, options={})
             # Get the model node
