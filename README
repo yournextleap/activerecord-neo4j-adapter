@@ -34,7 +34,7 @@ graph_development:
 
 Some regular model:
 
-class User < ActiveRecord::Base
+class AdapterTest < ActiveRecord::Base
 
 ...
 
@@ -42,9 +42,29 @@ end
 
 Model using neo4j_rest adapter (add establish_connection to corresponding entry in database.yml):
 
-class User < ActiveRecord::Base
+class AdapterTest < ActiveRecord::Base
   establish_connection "graph_#{Rails.env}"
 
   ...
 
 end
+
+In case the primary connection is non-neo4j_rest, migrations need to be modified a bit.
+
+Sample migration:
+
+class CreateAdapterTests < ActiveRecord::HybridDatabaseConnector::Migration
+  connection_for AdapterTest
+
+  def self.up
+    create_table :adapter_tests do |t|
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :adapter_tests
+  end
+end
+
+connection_for takes a class which could guide ActiveRecord::Migrator to use a neo4j_rest connection. In the above case, AdapterTest has an establish_connection with neo4j_rest adapter, hence "connection_for AdapterTest"
