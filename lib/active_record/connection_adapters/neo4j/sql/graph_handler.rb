@@ -12,7 +12,7 @@ module ActiveRecord
             #model_node = get_model_node(selections.last[:model])
             #model_node.outgoing('instances').collect{|instance| selections.last[:attributes].collect{|attribute| instance.send(attribute)}}
             #selections.map do |selection|
-              execute_gremlin(selections.last[:query], name, {:start_node => get_model_node_id(selections.last[:model])})['data']
+              execute_gremlin(selections.last[:query], name, {:start_node => get_model_node_id(selections.last[:model])})
             #end
           end
 

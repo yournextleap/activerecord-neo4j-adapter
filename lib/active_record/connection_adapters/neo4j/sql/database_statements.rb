@@ -1,5 +1,6 @@
 require 'neography/node'
 require 'active_record/connection_adapters/graph/definitions/model_definition'
+require 'neo4j/result'
 
 module ActiveRecord
   module ConnectionAdapters
@@ -68,7 +69,8 @@ module ActiveRecord
           end
 
           def select_rows(arel_response, name=nil)
-            send "execute_#{arel_response.type}", arel_response.params, name
+            result = send "execute_#{arel_response.type}", arel_response.params, name
+            ::Neo4j::Result.new(result['columns'], result['data']).to_a
           end
 
           protected
@@ -98,6 +100,12 @@ module ActiveRecord
             index_hash[:unique] = options[:unique].present?
             index_hash
           end
+
+          private
+          def select(arel_response, name=nil)
+            result = send "execute_#{arel_response.type}", arel_response.params, name
+            ::Neo4j::Result.new(result['columns'], result['data']).each(:as => :hash)
+          end # select
         end # DatabaseStatements
       end # Sql
     end # Neo4j
