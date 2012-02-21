@@ -19,7 +19,7 @@ module ActiveRecord
             
             raise ArgumentError.new("Model #{model_name} already exists!") if table_exists?(model_name)
 
-            model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.new model_name
+            model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.new model_name, self
             model_definition.primary_key(options[:primary_key] || Base.get_primary_key(model_name.to_s.singularize)) unless options[:id] == false
 
             yield model_definition if block_given?
@@ -77,7 +77,7 @@ module ActiveRecord
 
           def insert_sql(arel_response, name = nil, pk = nil, id_value = nil, sequence_name = nil)
             send "execute_#{arel_response.type}", arel_response.params, name
-            id_value
+            #id_value
           end
 
           def update_sql(arel_response, name=nil)

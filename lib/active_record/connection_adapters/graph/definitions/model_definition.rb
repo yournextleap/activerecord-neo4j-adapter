@@ -4,14 +4,15 @@ module ActiveRecord
       module Definitions
         class ModelDefinition
           attr_accessor :columns
-          def initialize(model_name)
+          def initialize(model_name, base)
             @model_name = model_name.to_s
             @columns = []
             @primary_key = nil
+            @base = base
           end
 
           def column(column_name, column_type, options={})
-             @columns << {:name => column_name.to_s, :type => column_type.to_s}.inspect
+             @columns << {:name => column_name.to_s, :type => @base.type_to_sql(column_type).to_sym.to_s}.inspect
           end
 
           def timestamps(*args)

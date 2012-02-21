@@ -23,6 +23,13 @@ module ActiveRecord
 
       attr_accessor :neo_server
 
+      NATIVE_DATABASE_TYPES = {
+                       :primary_key => "integer"
+                      }
+      def native_database_types
+        NATIVE_DATABASE_TYPES
+      end
+
       def initialize(neo4j_server, log)
         self.neo_server = neo4j_server
         super(self.neo_server, log)

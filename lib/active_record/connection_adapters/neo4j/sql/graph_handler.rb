@@ -19,10 +19,9 @@ module ActiveRecord
           def execute_insert(insertions, name=nil)
             model_node_id = get_model_node_id(insertions[:model])
             node_id = execute_gremlin(insertions[:query],name)['self'].split('/').last.to_i
-
-            
             execute_gremlin("model=g.v(#{model_node_id}); instance=g.v(#{node_id}); g.addEdge(model, instance, 'instances')", name)
-             
+            
+            node_id
           end
 
           def execute_delete(deletion, name=nil)
