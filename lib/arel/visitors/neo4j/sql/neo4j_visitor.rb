@@ -151,14 +151,35 @@ module Arel
               "v(start_node)",
               "out('instances')",
               ("filter{#{o.wheres.map { |x| visit x }.join ' && ' }}" unless o.wheres.empty?),
-              "#{o.projections.map{|x| "#{visit(x).to_s}.as(#{visit(x).to_s.inspect})"}.join('.back(1).')}",
-              "table(t, #{o.projections.map{|x| visit(x).to_s}.inspect})",
+              "#{o.projections.map{|x| visit_As_Projection(x)}.join('.back(1).')}",
+              "table(t, #{o.projections.map{|x| visit_Column_Projection(x)}.flatten.inspect})",
               "iterate();t;",
               #("WHERE #{o.wheres.map { |x| visit x }.join ' AND ' }" unless o.wheres.empty?),
               #("GROUP BY #{o.groups.map { |x| visit x }.join ', ' }" unless o.groups.empty?),
               #(visit(o.having) if o.having),
             #].compact.join ' '
             ].compact.join '.'
+          end
+
+          # Hack fix to convert table_name.* to Gremlin equivalent
+          def visit_As_Projection o
+            visited_value = visit(o).to_s
+
+            if visited_value =~ /^.*(\.\*)$/
+              "id.as(\"id\").back(1).map().as(\"properties\")"
+            else
+              "#{visited_value}.as(#{visited_value.inspect})"
+            end
+          end
+
+          def visit_Column_Projection o
+            visited_value = visit(o).to_s
+
+            if visited_value =~ /^.*(\.\*)$/
+              ["id","properties"]
+            else
+              visited_value
+            end
           end
 
           def visit_Arel_Nodes_Having o
