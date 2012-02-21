@@ -13,7 +13,7 @@ module Neo4j
       when :hash
         result = []
         @data.each do |row|
-          result << @columns.zip(row).map{|column, value| {column => value}}.inject({}){|hash, injected| hash.merge!(injected)}
+          result << @columns.zip(row).map{|column, value| {column => (value == "null" ? nil : value)}}.inject({}){|hash, injected| hash.merge!(injected)}
         end
         result
       else
