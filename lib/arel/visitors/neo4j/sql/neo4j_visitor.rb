@@ -112,7 +112,7 @@ module Arel
           end
 
           def visit_Arel_Nodes_Values values
-            values.expressions.zip(values.columns).map{|expression, column| "#{column.name.to_s} : #{visit expression}"}.join(',')
+            values.expressions.zip(values.columns).map{|expression, column| (visit(expression).present? ? "#{column.name.to_s} : #{visit expression}" : nil)}.compact.join(',')
             #values.expressions.zip(values.columns).map{|expression, column| {column.name => expression}}.inject({}){|h,i| h.merge(i)}
 =begin
             "VALUES (#{o.expressions.zip(o.columns).map { |value, column|
@@ -371,7 +371,7 @@ module Arel
 
           def visit_String o
            #quote(o, last_column)
-           o.inspect
+           o.inspect if o.present?
           end
 
           def visit_DateTime o
