@@ -57,7 +57,7 @@ class CreateAdapterTests < ActiveRecord::HybridDatabaseConnector::Migration
   connection_for AdapterTest
 
   def self.up
-    create_table :adapter_tests do |t|
+    create_table :adapter_tests, :class_name => AdapterTest.to_s do |t|
       t.timestamps
     end
   end
@@ -67,4 +67,5 @@ class CreateAdapterTests < ActiveRecord::HybridDatabaseConnector::Migration
   end
 end
 
-connection_for takes a class which could guide ActiveRecord::Migrator to use a neo4j_rest connection. In the above case, AdapterTest has an establish_connection with neo4j_rest adapter, hence "connection_for AdapterTest"
+- connection_for takes a class which could guide ActiveRecord::Migrator to use a neo4j_rest connection. In the above case, AdapterTest has an establish_connection with neo4j_rest adapter, hence "connection_for AdapterTest"
+- :class_name option in create_table ensures that model class name is stored on model super node. This would enable graph relationships across heterogenous data types.
