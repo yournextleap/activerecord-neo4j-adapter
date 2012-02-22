@@ -9,7 +9,8 @@ module Arel
         end
 
         def gsub(match, replacement)
-          @params[:query].gsub(match, replacement)
+          params_array = Array.wrap @params
+          params_array.map{|params| params[:query].gsub(match, replacement)}.join
         end # gsub
       end # Response
     end # Neo4j
