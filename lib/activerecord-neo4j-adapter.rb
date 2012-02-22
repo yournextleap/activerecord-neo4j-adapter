@@ -1,5 +1,6 @@
 require "activerecord-neo4j-adapter/version"
 require 'active_record/hybrid_database_connector'
+require 'active_record/connection_adapters/neo4j/graph_methods'
 
 module Activerecord
   module Neo4j
