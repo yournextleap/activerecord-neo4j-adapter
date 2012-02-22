@@ -36,6 +36,9 @@ module ActiveRecord
           end # primary_key
 
           def drop_table(model_name, options={})
+            # Delete all model instances
+            delete_all_instances_of model_name
+
             # Get the model node
             model_node = get_model_node model_name
 
@@ -106,6 +109,19 @@ module ActiveRecord
             result = send "execute_#{arel_response.type}", arel_response.params, name
             ::Neo4j::Result.new(result['columns'], result['data']).each(:as => :hash)
           end # select
+
+          def delete_all_instances_of model_name
+            model_node_id = get_model_node_id model_name
+
+            script = [
+                      "g",
+                      "v(#{model_node_id})",
+                      "out('instances')",
+                      "each{g.removeVertex(it)}"
+                    ].join('.')
+
+            neo_server.execute_script script
+          end
         end # DatabaseStatements
       end # Sql
     end # Neo4j
