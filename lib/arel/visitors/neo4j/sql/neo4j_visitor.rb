@@ -217,9 +217,13 @@ module Arel
           end
 
           def visit_Arel_Nodes_Count o
+            "count()"
+=begin
             "COUNT(#{o.distinct ? 'DISTINCT ' : ''}#{o.expressions.map { |x|
               visit x
             }.join(', ')})#{o.alias ? " AS #{visit o.alias}" : ''}"
+=end
+
           end
 
           def visit_Arel_Nodes_Sum o
