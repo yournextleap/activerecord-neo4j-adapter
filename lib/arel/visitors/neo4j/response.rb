@@ -7,6 +7,10 @@ module Arel
           @type = type
           @params = options[:params] if options[:params].present?
         end
+
+        def gsub(match, replacement)
+          @params[:query].gsub(match, replacement)
+        end # gsub
       end # Response
     end # Neo4j
   end # Visitors
