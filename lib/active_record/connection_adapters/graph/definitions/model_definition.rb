@@ -3,7 +3,7 @@ module ActiveRecord
     module Graph
       module Definitions
         class ModelDefinition
-          attr_accessor :columns
+          attr_accessor :columns, :class_name
           def initialize(model_name, base)
             @model_name = model_name.to_s
             @columns = []
@@ -31,6 +31,7 @@ module ActiveRecord
             return_hash['model'] = @model_name
             return_hash['columns'] = @columns
             return_hash['primary_key'] = @primary_key
+            return_hash['class_name'] = @class_name
         
             return_hash
           end

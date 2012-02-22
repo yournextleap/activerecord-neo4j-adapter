@@ -22,6 +22,8 @@ module ActiveRecord
             model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.new model_name, self
             model_definition.primary_key(options[:primary_key] || Base.get_primary_key(model_name.to_s.singularize)) unless options[:id] == false
 
+            model_definition.class_name = options[:class_name] if options[:class_name]
+
             yield model_definition if block_given?
 
             model_node = Neography::Node.create neo_server, model_definition.to_hash
