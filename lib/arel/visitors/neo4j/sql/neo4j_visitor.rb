@@ -63,7 +63,7 @@ module Arel
                       "v(start_node)",
                       "out('instances')",
                       ("filter{#{wheres.map { |x| visit x }.join ' && ' }}" unless wheres.empty?),
-                      "each{#{o.values.map{|x| "it.#{visit x}"}.join(',')}}"
+                      "each{#{o.values.map{|x| "it.#{visit x}"}.join(';')}}"
                     ].join('.')
 
             type = :update
