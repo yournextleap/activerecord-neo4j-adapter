@@ -18,14 +18,21 @@ module ActiveRecord
               node_id = record['self'].split('/').last.to_i
               # Get model node connected to this node
               model_node = connection.execute_gremlin("g.v(node_id).in('instances').next()", "GraphMethods", :node_id => node_id)
-              # Get relevant model from model node
-              model = (model_node['data']['class_name'] || model['data']['model']).classify.constantize
 
-              # Add node_id to record
-              record['data']['id'] = node_id
-              # Instantiate an object
-              instance = model.allocate
-              instance.init_with('attributes' => record['data'])
+              if not (model_node && model_node['data'] && model['data']['model'])
+                model = record['data']['model'].constantize
+                # Find the corresponding record in database
+                instance = model.find(record['data']['model_id'])
+              else
+                # Get relevant model from model node
+                model = (model_node['data']['class_name'] || model['data']['model']).classify.constantize
+                # Add node_id to record
+                record['data']['id'] = node_id
+                # Instantiate an object
+                instance = model.allocate
+                instance.init_with('attributes' => record['data'])
+              end
+
               instance
             end
           end # instantiate_from_graph
