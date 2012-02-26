@@ -32,11 +32,22 @@ module ActiveRecord
             execute_gremlin update[:query], name, {:start_node => get_model_node_id(update[:model])}
           end
 
+          def execute_remove_properties(model_name, *column_names)
+            query = [
+                      "g",
+                      "v(start_node)",
+                      "out('instances')",
+                      ("each{ #{column_names.map{|column_name| "it.removeProperty('"+column_name.to_s+"')"}.join(';')} }" if column_names.present?),
+                    ].compact.join('.')
+
+            execute_gremlin query, nil, {:start_node => get_model_node_id(model_name)}
+          end
+
           def execute_gremlin query, name=nil, params={}
             if name == :skip_logging
               neo_server.execute_script(query, params)
             else
-              log(query, name) { neo_server.execute_script(query, params) }
+              log(query, name || 'Gremlin') { neo_server.execute_script(query, params) }
             end
           end
 

@@ -11,7 +11,17 @@ module ActiveRecord
             @base = base
           end
 
+          def self.initialize_from_node(model_node, base)
+            model_definition = self.new model_node.model, base
+            model_definition.primary_key model_node.primary_key
+            model_definition.columns = model_node.columns
+            model_definition.class_name = model.class_name rescue ''
+
+            model_definition
+          end
+
           def column(column_name, column_type, options={})
+            raise ColumnExistsError.new("Column #{column_name} already exists") if @columns.map{|column| column[:name]}.include?(column_name.to_s)
              @columns << {:name => column_name.to_s, :type => @base.type_to_sql(column_type).to_sym.to_s}.inspect
           end
 
@@ -47,7 +57,9 @@ module ActiveRecord
             EOV
           end
 
-        end
+        end # ModelDefinition
+
+        class ColumnExistsError < StandardError; end
       end
     end
   end

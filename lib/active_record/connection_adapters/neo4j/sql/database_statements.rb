@@ -68,6 +68,23 @@ module ActiveRecord
             neo_server.set_node_properties model_node, {'indices' => model_indices}
           end # add_index
 
+          def add_column(model_name, column_name, type, options = {})
+            model_node = get_model_node model_name
+            model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.initialize_from_node(model_node, self)
+            model_definition.column column_name, type
+            neo_server.set_node_properties model_node, {'columns' => model_definition.columns}
+          end # add_column
+
+          def remove_column(model_name, *column_names)
+            model_node = get_model_node model_name
+            model_definition = ActiveRecord::ConnectionAdapters::Graph::Definitions::ModelDefinition.initialize_from_node(model_node, self)
+
+            model_definition.columns.reject!{|column| column_names.map{|column_name| column_name.to_s}.include?(eval(column)[:name])}
+            neo_server.set_node_properties model_node, {'columns' => model_definition.columns}
+
+            #execute_remove_properties model_name, column_names
+          end
+
           def columns(model_name, log_msg=nil)
             model_node = get_model_node model_name
             model_node.columns.collect{|column| Column.new eval(column)[:name], nil, eval(column)[:type]}
