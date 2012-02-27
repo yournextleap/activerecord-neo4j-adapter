@@ -19,7 +19,7 @@ module ActiveRecord
               # Get model node connected to this node
               model_node = connection.execute_gremlin("g.v(node_id).in('instances').next()", "GraphMethods", :node_id => node_id)
 
-              if not (model_node && model_node['data'] && model['data']['model'])
+              if not (model_node && model_node['data'] && model_node['data']['model'])
                 model = record['data']['model'].constantize
                 # Find the corresponding record in database
                 instance = model.find(record['data']['model_id'])
