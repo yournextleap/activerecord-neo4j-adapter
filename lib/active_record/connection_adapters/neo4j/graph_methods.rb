@@ -14,6 +14,8 @@ module ActiveRecord
 
             records = Array.wrap records
             records.map do |record|
+              record = connection.execute_gremlin("g.v(#{record})") unless record.is_a? Hash
+
               # Get node id from graph record
               node_id = record['self'].split('/').last.to_i
               # Get model node connected to this node
