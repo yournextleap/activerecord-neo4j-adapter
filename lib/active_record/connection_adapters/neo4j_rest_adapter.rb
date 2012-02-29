@@ -58,15 +58,16 @@ module ActiveRecord
             if column && column.type == :binary && column.class.respond_to?(:string_to_binary)
               "\"#{quote_string(column.class.string_to_binary(value))}\"" # ' (for ruby-mode)
             elsif column && [:integer, :float].include?(column.type)
-              value = column.type == :integer ? value.to_i : value.to_f
-              "'#{value.to_s}'"
+              value = column.type == :integer ? value.to_i.to_s : "'#{value.to_f.to_s}'"
+              value
             else
               "\"#{quote_string(value)}\"" # ' (for ruby-mode)
             end
           when NilClass                 then "null"
           when TrueClass                then (column && column.type == :integer ? '1' : quoted_true)
           when FalseClass               then (column && column.type == :integer ? '0' : quoted_false)
-          when Float, Fixnum, Bignum    then "'#{value.to_s}'"
+          when Float                    then "'#{value.to_s}'"
+          when Fixnum, Bignum           then value.to_s
           # BigDecimals need to be output in a non-normalized form and quoted.
           when BigDecimal               then "'#{value.to_s('F')}'"
           when Symbol                   then "'#{quote_string(value.to_s)}'"
