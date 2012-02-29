@@ -58,7 +58,7 @@ module ActiveRecord
             if column && column.type == :binary && column.class.respond_to?(:string_to_binary)
               "\"#{quote_string(column.class.string_to_binary(value))}\"" # ' (for ruby-mode)
             elsif column && [:integer, :float].include?(column.type)
-              value = column.type == :integer ? value.to_i.to_s : "new Float(#{value.to_f.to_s})"
+              value = column.type == :integer ? value.to_i.to_s : "new Float(#{value.to_f.to_s})" # Coerce float to Float explicitly
               value
             else
               "\"#{quote_string(value)}\"" # ' (for ruby-mode)
@@ -68,7 +68,8 @@ module ActiveRecord
           when FalseClass               then (column && column.type == :integer ? '0' : quoted_false)
           when Float                    then "new Float(#{value.to_s})"
           when Fixnum, Bignum           then value.to_s
-          # BigDecimals need to be output in a non-normalized form and quoted.
+          # BigDecimals need to be output in a non-normalized form
+          # and coerced to Float (Neo4j doesn't support BigDecimal as long as 1.6M03)
           when BigDecimal               then "new Float(#{value.to_s('F')})"
           when Symbol                   then "'#{quote_string(value.to_s)}'"
           else
