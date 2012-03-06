@@ -321,7 +321,22 @@ module Arel
           end
 
           def visit_Arel_Nodes_In o
-          "#{visit o.left} IN (#{visit o.right})"
+            left = visit o.left
+            
+            if left == :id
+              right = o.right.map{|element| "new Long(#{visit element}.toString())"}.join(',')
+            else
+              right = o.right.map{|element| "#{visit element}"}.join(',')
+            end
+
+            right = [
+                      "[",
+                      right,
+                      "]"
+                    ].compact.join
+
+            "#{right}.contains(it.#{left})"
+          
           end
 
           def visit_Arel_Nodes_NotIn o
