@@ -1,3 +1,9 @@
+Note:
+-----
+
+This adapter was tested with ActiveRecord 3.0.9 running with Rails 3.0.9
+Adapter uses Max De Marzi's Neography 0.0.22 internally to establish connection with a Neo4j REST server
+
 Sample configuration:
 ---------------------
 
