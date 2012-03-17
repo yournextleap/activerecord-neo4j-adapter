@@ -25,7 +25,7 @@ module ActiveRecord
                 instance = model.find(record['data']['model_id'])
               else
                 # Get relevant model from model node
-                model = (model_node['data']['class_name'] || model['data']['model']).classify.constantize
+                model = (model_node['data']['class_name'] || model_node['data']['model']).classify.constantize
                 # Add node_id to record
                 record['data']['id'] = node_id
                 # Instantiate an object

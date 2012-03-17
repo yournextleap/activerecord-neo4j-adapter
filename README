@@ -78,3 +78,12 @@ node = AdapterTest.connection.execute_gremlin 'g.v(48)'
 adapter_instance = AdapterTest.load_from_graph node
 
 # load_from_graph would accept a node hash or an array of hashes
+
+Most AREL syntaxes shall work:
+------------------------------
+
+AdapterTest.select(:name).where(:id => [1,2,3,4])
+AdapterTest.create(:name => 'Neo')
+AdapterTest.where(:name => 'Neo').update_all :alias => 'Anderson'
+AdapterTest.where(:name => 'Neo').destroy_all
+
