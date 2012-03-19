@@ -27,10 +27,9 @@ module Neo4j
     def denormalize_column_values(column, value)
       return {column => (value == "null" ? nil : value)} if (column != 'properties')
 
-      value.gsub(/(\{|\})/,'')\
-            .split(', ')\
-            .map{|pair| {pair.split('=')[0] => pair.split('=')[1]}}\
-            .inject({}){|hash, injected| hash.merge!(injected)}
+      # Since Neo4j 1.7M01, map() returns a hash
+      # So no need to gsub on a string output obtained from map() any more
+      value
     end
 
   end # Result
