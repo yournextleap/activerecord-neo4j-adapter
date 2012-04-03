@@ -8,7 +8,7 @@ module ActiveRecord
       Neography::Config.server = config[:host] if config[:host]
       Neography::Config.port = config[:port] if config[:port]
 
-      ConnectionAdapters::Neo4jRestAdapter.new(Neography::Rest.new, logger)
+      ConnectionAdapters::Neo4jRestAdapter.new(Neography::Rest.new, logger, config)
     end
   end # ActiveRecord::Base
 
@@ -21,7 +21,7 @@ module ActiveRecord
                   :model => 'model_index'
                 }
 
-      attr_accessor :neo_server
+      attr_accessor :neo_server, :root
 
       NATIVE_DATABASE_TYPES = {
                        :primary_key => "integer"
@@ -30,8 +30,9 @@ module ActiveRecord
         NATIVE_DATABASE_TYPES
       end
 
-      def initialize(neo4j_server, log)
+      def initialize(neo4j_server, log, config)
         self.neo_server = neo4j_server
+        self.root = config[:root]
         super(self.neo_server, log)
         
         # Create model index if it doesn't exist
