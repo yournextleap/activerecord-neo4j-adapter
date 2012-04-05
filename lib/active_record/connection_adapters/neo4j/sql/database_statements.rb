@@ -30,6 +30,9 @@ module ActiveRecord
             
             neo_server.add_node_to_index indices[:model], 'type', 'model', model_node
             neo_server.add_node_to_index indices[:model], 'model', model_name, model_node
+
+	    # For backup and restore purpose, connect this model node to root
+	    execute_gremlin "g.addEdge(g.v(root_node_id), g.v(model_node_id), 'models')", 'Connecting model to root', :root_node_id => self.root, :model_node_id => model_node.neo_id
           end # create_table
 
           def primary_key(model_name)

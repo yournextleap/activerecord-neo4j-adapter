@@ -23,4 +23,14 @@ namespace :neo4j_rest do
       print '\b'
     end
   end
+
+  desc 'Restores an imported graph'
+  task :restore => :environment do
+    # Construct a query to get all model nodes
+    # And add them to respective indices
+    query = "index=g.idx('model_index');"
+    query += "g.v(root).out('models').sideEffect{index.put('type', 'model', it)}.back(1).sideEffect{index.put('model', it.model, it)}"
+
+    Neo4jRestIllustrator.connection.execute_gremlin query, 'Indexing models', :root => Neo4jRestIllustrator.connection.root
+  end
 end
