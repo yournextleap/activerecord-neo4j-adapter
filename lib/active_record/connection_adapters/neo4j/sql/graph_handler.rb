@@ -17,10 +17,11 @@ module ActiveRecord
           end
 
           def execute_insert(insertions, name=nil)
-            model_node_id = get_model_node_id(insertions[:model])
+            model_node = get_model_node(insertions[:model])
             node_id = execute_gremlin(insertions[:query],name)['self'].split('/').last.to_i
-            execute_gremlin("model=g.v(#{model_node_id}); instance=g.v(#{node_id}); g.addEdge(model, instance, 'instances')", name)
+            execute_gremlin("model=g.v(#{model_node.neo_id}); instance=g.v(#{node_id}); g.addEdge(model, instance, 'instances')", name)
             
+            execute_gremlin "g.v(#{node_id}).__type__='#{model_node.class_name}'"
             node_id
           end
 
