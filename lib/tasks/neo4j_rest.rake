@@ -20,7 +20,7 @@ namespace :neo4j_rest do
       # Update columns property
       node = Neography::Node.load model['self'].split('/').last
       Neo4jRestIllustrator.connection.neo_server.set_node_properties node, {'columns' => columns}
-      print '\b'
+      print "\b"
     end
   end
 
@@ -32,5 +32,15 @@ namespace :neo4j_rest do
     query += "g.v(root).out('models').sideEffect{index.put('type', 'model', it)}.back(1).sideEffect{index.put('model', it.model, it)}"
 
     Neo4jRestIllustrator.connection.execute_gremlin query, 'Indexing models', :root => Neo4jRestIllustrator.connection.root
+  end
+
+  desc "Adds an explicit __type__ property to each instance node"
+  task :add_type_to_instances => :environment do
+    model_nodes = Neo4jRestIllustrator.connection.execute_gremlin("g.v(root_node_id).out('models')", 'Get model nodes', :root_node_id => Neo4jRestIllustrator.connection.root)
+    model_nodes.each do |model|
+      query = "g.v(#{model['self'].split('/').last}).out('instances').each{it.__type__ = '#{model['data']['class_name']}'}"
+
+      Neo4jRestIllustrator.connection.execute_gremlin query
+    end
   end
 end
