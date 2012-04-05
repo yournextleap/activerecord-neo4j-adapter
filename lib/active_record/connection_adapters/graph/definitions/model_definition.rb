@@ -39,7 +39,7 @@ module ActiveRecord
           def to_hash
             return_hash = {}
             return_hash['model'] = @model_name
-            return_hash['columns'] = @columns
+            return_hash['columns'] = @columns.inspect
             return_hash['primary_key'] = @primary_key
             return_hash['class_name'] = @class_name
         
