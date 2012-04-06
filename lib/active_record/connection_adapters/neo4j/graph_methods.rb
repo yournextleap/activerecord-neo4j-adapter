@@ -19,6 +19,8 @@ module ActiveRecord
 
               if !!record['data']['model']
                 model = record['data']['model'].constantize
+                # Add model_id to record as id
+                record['data']['id'] = record['data']['model_id']
                 # Find the corresponding record in database
                 #instance = model.find(record['data']['model_id'])
               else
