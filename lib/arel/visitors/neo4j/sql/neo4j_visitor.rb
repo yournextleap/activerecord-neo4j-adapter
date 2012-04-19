@@ -370,6 +370,10 @@ module Arel
             end
           end
 
+      	  def visit_Arel_Nodes_Inequality o
+            "it.#{visit(o.left).to_s} #{o.operand} #{visit o.right}"
+          end
+
           def visit_Arel_Nodes_NotEqual o
             right = o.right
 
