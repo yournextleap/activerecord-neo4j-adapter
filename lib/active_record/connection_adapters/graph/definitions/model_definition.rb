@@ -14,7 +14,7 @@ module ActiveRecord
           def self.initialize_from_node(model_node, base)
             model_definition = self.new model_node.model, base
             model_definition.primary_key model_node.primary_key
-            model_definition.columns = model_node.columns
+            model_definition.columns = eval model_node.columns
             model_definition.class_name = model.class_name rescue ''
 
             model_definition
@@ -42,7 +42,7 @@ module ActiveRecord
             return_hash['columns'] = @columns.inspect
             return_hash['primary_key'] = @primary_key
             return_hash['class_name'] = @class_name
-        
+
             return_hash
           end
 
