@@ -34,7 +34,7 @@ module ActiveRecord
         self.neo_server = neo4j_server
         self.root = config[:root]
         super(self.neo_server, log)
-        
+
         # Create model index if it doesn't exist
         neo_server.create_node_index(INDICES[:model]) if not (!!(node_indices = neo_server.list_node_indexes) and !!node_indices[INDICES[:model]])
       end
@@ -93,7 +93,6 @@ module ActiveRecord
         s\
         .gsub(/\n/,"\\n")\
         .gsub(/\a/,"\\a")\
-        .gsub(/\b/,"\\b")\
         .gsub(/\e/,"\\e")\
         .gsub(/\f/,"\\f")\
         .gsub(/\r/,"\\r")\
