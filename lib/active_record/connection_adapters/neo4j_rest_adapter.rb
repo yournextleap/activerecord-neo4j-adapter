@@ -85,7 +85,21 @@ module ActiveRecord
       # Quotes a string, escaping any ' (single quote) and \ (backslash)
       # characters.
       def quote_string(s)
-        s.gsub(/\\/, '\&\&').gsub(/"/, "\\\"") # ' (for ruby-mode)
+        escape s.gsub(/\\/, '\&\&').gsub(/"/, "\\\"") # ' (for ruby-mode)
+      end
+
+      # Escapes escape sequences
+      def escape(s)
+        s\
+        .gsub(/\n/,"\\n")\
+        .gsub(/\a/,"\\a")\
+        .gsub(/\b/,"\\b")\
+        .gsub(/\e/,"\\e")\
+        .gsub(/\f/,"\\f")\
+        .gsub(/\r/,"\\r")\
+        .gsub(/\s/,"\\s")\
+        .gsub(/\t/,"\\t")\
+        .gsub(/\v/,"\\v")
       end
 
     end # ActiveRecord::ConnectionAdapters::Neo4jRestAdapter
