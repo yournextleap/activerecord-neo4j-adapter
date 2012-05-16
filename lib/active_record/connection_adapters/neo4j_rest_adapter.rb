@@ -96,7 +96,6 @@ module ActiveRecord
         .gsub(/\e/,"\\e")\
         .gsub(/\f/,"\\f")\
         .gsub(/\r/,"\\r")\
-        .gsub(/\s/,"\\s")\
         .gsub(/\t/,"\\t")\
         .gsub(/\v/,"\\v")
       end
