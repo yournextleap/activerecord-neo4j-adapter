@@ -21,7 +21,7 @@ module ActiveRecord
           end
 
           def column(column_name, column_type, options={})
-            raise ColumnExistsError.new("Column #{column_name} already exists") if @columns.map{|column| column[:name]}.include?(column_name.to_s)
+            raise ColumnExistsError.new("Column #{column_name} already exists") if @columns.map{|column| (eval column)[:name]}.include?(column_name.to_s)
              @columns << {:name => column_name.to_s, :type => @base.type_to_sql(column_type).to_sym.to_s}.inspect
           end
 
